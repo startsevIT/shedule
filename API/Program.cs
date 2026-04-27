@@ -1,6 +1,7 @@
 using System.Text;
 using Application.Services.Users;
 using Domain.Entity;
+using Domain.Users;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -10,14 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 var jwtConfig = builder.Configuration.GetSection("JwtSettings");
 var smtpConfig = builder.Configuration.GetSection("SmtpSettings");
+var adminCredentials = builder.Configuration.GetSection("AdminCredentials");
 builder.Services.Configure<JwtSettings>(jwtConfig);
 builder.Services.Configure<SmtpSettings>(smtpConfig);
+builder.Services.Configure<AdminCredentials>(adminCredentials);
 
 builder.Services.AddScoped<IDbContext, SqLiteDbContext>();
-
-builder.RegisterRepositories();
-
-builder.RegisterServices();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -36,6 +35,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization();
 
+builder.Services.AddRepositories();
+builder.Services.AddServices();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
@@ -77,23 +78,19 @@ app.UseCors(policy => policy
     .AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader());
+
 app.Run();
 
 public static class ServiceRegistrator
 {
-    public static void RegisterServices(this WebApplicationBuilder builder)
+    extension(IServiceCollection services)
     {
-        var services = AssemblyReflectionExtensions.GetServices();
-        foreach (var service in services)
-            builder.Services.AddScoped(service);
-    }
-    public static void RegisterRepositories(this WebApplicationBuilder builder)
-    {
-        var repositories = AssemblyReflectionExtensions.GetRepositories();
-        foreach (var repository in repositories)
-            builder.Services.AddScoped(repository.Interface,repository.Implementation);
-        /*builder.Services.AddScoped<IUserRepository, UserRepository>();
-        builder.Services.AddScoped<IPairRepository, PairRepository>();
-        builder.Services.AddScoped<IGroupRepository, GroupRepository>();*/
+        public void AddServices()
+            => AssemblyReflectionExtensions.GetServices()
+                .ForEach(x => services.AddScoped(x));
+
+        public void AddRepositories()
+            => AssemblyReflectionExtensions.GetRepositories()
+                .ForEach(x => services.AddScoped(x.Interface, x.Implementation));
     }
 }

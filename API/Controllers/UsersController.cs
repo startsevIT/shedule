@@ -16,21 +16,21 @@ public class UsersController(UserService service) : ControllerBase
         return Created();
     }
 
-    [HttpPost("/manager")]//TODO, Authorize(Roles = Role.Workers)]
+    [HttpPost("/manager"), Authorize(Roles = Role.Workers)]
     public async Task<IActionResult> Register([FromBody] ManagerRegisterDto[] dtos)
     {
         await service.RegisterManager(dtos);
         return Created();
     }
 
-    [HttpPost("/students")]//TODO, Authorize(Roles = Role.Workers)]
+    [HttpPost("/students"), Authorize(Roles = Role.Workers)]
     public async Task<IActionResult> Register([FromBody] StudentRegisterDto[] dtos)
     {
         await service.RegisterStudents(dtos);
         return Created();
     }
 
-    [HttpPost("/teachers")]//TODO, Authorize(Roles = Role.Workers)]
+    [HttpPost("/teachers"), Authorize(Roles = Role.Workers)]
     public async Task<IActionResult> Register([FromBody] TeacherRegisterDto[] dtos)
     {
         await service.RegisterTeachers(dtos);
@@ -62,7 +62,7 @@ public class UsersController(UserService service) : ControllerBase
         return Ok();
     }
 
-    [HttpPut("/account/{id:guid}")]//TODO, Authorize(Roles = Role.Workers)]
+    [HttpPut("/account/{id:guid}"), Authorize(Roles = Role.Workers)]
     public IActionResult Update(Guid id, UserUpdateDto dto)
     {
         service.Update(id, dto);

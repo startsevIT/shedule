@@ -10,14 +10,6 @@ public class Mark : ModifyEntity<MarkUpdateDto>
     private MarkType MarkType { get; set; }
     private int Value { get; set; }
 
-    private Mark(Guid teacherId, Guid studentId, Guid objectId, MarkType markType, int value)
-    {
-        TeacherId = teacherId;
-        StudentId = studentId;
-        ObjectId = objectId;
-        MarkType = markType;
-        Value = value;
-    }
 
     public static Mark Create(
         Guid teacherId,
@@ -25,7 +17,14 @@ public class Mark : ModifyEntity<MarkUpdateDto>
         Guid objectId,
         MarkType markType,
         int value)
-        => new(teacherId, studentId, objectId, markType, value);
+        => new()
+        {
+            TeacherId = teacherId,
+            StudentId = studentId,
+            ObjectId = objectId,
+            MarkType = markType,
+            Value = value
+        };
 
     public override void Update(MarkUpdateDto dto)
     {

@@ -8,32 +8,23 @@ namespace Domain.Users;
 [Table("users")]
 public class User : ModifyEntity<UserUpdateDto>
 {
-    [Column("first_name")]
-    private string FirstName { get; set; } = null!;
+    [Column("first_name")] private string FirstName { get; set; } = null!;
 
-    [Column("name")]
-    private string Name { get; set; } = null!;
+    [Column("name")] private string Name { get; set; } = null!;
 
-    [Column("patronymic")]
-    private string Patronymic { get; set; } = null!;
+    [Column("patronymic")] private string Patronymic { get; set; } = null!;
 
-    [Column("email")]
-    public string Email { get; private init; } = null!;
+    [Column("email")] public string Email { get; private init; } = null!;
 
-    [Column("phone")]
-    public string Phone { get; private init; } = null!;
+    [Column("phone")] public string Phone { get; private init; } = null!;
 
-    [Column("hashed_password")]
-    private string HashedPassword { get; set; } = null!;
+    [Column("hashed_password")] public string HashedPassword { get; set; } = null!;
 
-    [Column("salt")]
-    private string Salt { get; set; } = null!;
+    [Column("salt")] public string Salt { get; set; } = null!;
 
-    [Column("roles")]
-    public List<string> Roles { get; private init; } = null!;
+    [Column("roles")] public List<string> Roles { get; private init; } = null!;
 
-    [Column("group_id")]
-    public Guid? GroupId { get; private set; }
+    [Column("group_id")] public Guid? GroupId { get; private set; }
 
     public string Initials => $"{FirstName} {Name[0]}.{Patronymic[0]}.";
     public string FullName => $"{FirstName} {Name} {Patronymic}";
@@ -51,6 +42,22 @@ public class User : ModifyEntity<UserUpdateDto>
 
     private static byte[] ComputedHash(string password, byte[] saltBytes)
         => Rfc2898DeriveBytes.Pbkdf2(password, saltBytes, 10000, HashAlgorithmName.SHA256, 32);
+
+    public static User CreateAdmin(AdminCredentials credentials)
+    {
+        var (hashedPassword, salt) = HashPassword(credentials.Password);
+        return new User
+        {
+            FirstName = credentials.FirstName,
+            Name = credentials.Name,
+            Patronymic = credentials.Patronymic,
+            Email = credentials.Email,
+            Phone = credentials.Phone,
+            HashedPassword = hashedPassword,
+            Salt = salt,
+            Roles = [credentials.Role]
+        };
+    }
 
     public static User Create(RegisterDto dto, string password)
     {
@@ -111,10 +118,10 @@ public class User : ModifyEntity<UserUpdateDto>
         if (dtoAddedRoles.Intersect(dtoRemovedRoles).Any())
             throw new Exception("Попытка удалить и добавить одни и те же роли");
 
-        foreach (var role in dtoAddedRoles)
+        foreach (var role in dtoAddedRoles.Where(x => !Roles.Contains(x)))
             Roles.Add(role);
 
-        foreach (var role in dtoRemovedRoles)
+        foreach (var role in dtoRemovedRoles.Where(x => Roles.Contains(x)))
         {
             if (role == Role.Student)
                 GroupId = null;
@@ -218,3 +225,14 @@ public record UserUpdateDto(
     HashSet<string>? AddedRoles,
     HashSet<string>? RemovedRoles,
     Guid? GroupId = null) : UpdateDto;
+
+public class AdminCredentials
+{
+    public string FirstName { get; set; } = null!;
+    public string Name { get; set; } = null!;
+    public string Patronymic { get; set; } = null!;
+    public string Email { get; set; } = null!;
+    public string Phone { get; set; } = null!;
+    public string Password { get; set; } = null!;
+    public string Role { get; set; } = null!;
+}

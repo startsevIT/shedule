@@ -1,6 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using Domain.Entity;
+using Domain.Users;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure;
 
@@ -8,9 +10,14 @@ public sealed class SqLiteDbContext : DbContext, IDbContext
 {
     private readonly ConcurrentDictionary<Type, object> _dbSets = new();
 
-    public SqLiteDbContext()
+    public SqLiteDbContext(IOptions<AdminCredentials> credentialsOptions)
     {
-        Database.EnsureCreated();
+        if (Database.EnsureCreated())
+        {
+            var users = GetDbSet<User>();
+            users.Add(User.CreateAdmin(credentialsOptions.Value));
+            SaveChanges();
+        }
     }
 
     public DbSet<T> GetDbSet<T>() where T : Entity

@@ -4,28 +4,10 @@ namespace Domain.Homeworks;
 
 public class Homework : ModifyEntity<HomeworkUpdateDto>
 {
-    private Homework(
-        Guid teacherId,
-        Guid studentId,
-        string title,
-        string description,
-        DateTime startDate,
-        DateTime endDate,
-        HomeworkStatus status)
-    {
-        TeacherId = teacherId;
-        StudentId = studentId;
-        Title = title;
-        Description = description;
-        StartDate = startDate;
-        EndDate = endDate;
-        Status = status;
-    }
-
     private Guid TeacherId { get; set; }
     private Guid StudentId { get; set; }
-    private string Title { get; set; }
-    private string Description { get; set; }
+    private string Title { get; set; } = null!;
+    private string Description { get; set; } = null!;
     private DateTime StartDate { get; set; }
     private DateTime EndDate { get; set; }
     private HomeworkStatus Status { get; set; }
@@ -36,7 +18,16 @@ public class Homework : ModifyEntity<HomeworkUpdateDto>
         string description,
         DateTime startDate,
         DateTime endDate)
-        => new(teacherId, studentId, title, description, startDate, endDate, HomeworkStatus.InProgress);
+        => new()
+        {
+            TeacherId = teacherId,
+            StudentId = studentId,
+            Title = title,
+            Description = description,
+            StartDate = startDate,
+            EndDate = endDate,
+            Status = HomeworkStatus.InProgress
+        };
 
     public static Homework Create(Guid teacherId,
         Guid studentId,
@@ -44,7 +35,16 @@ public class Homework : ModifyEntity<HomeworkUpdateDto>
         string description,
         DateTime startDate,
         int durationInDay)
-        => new(teacherId, studentId, title, description, startDate, startDate.AddDays(durationInDay), HomeworkStatus.InProgress);
+        => new()
+        {
+            TeacherId = teacherId,
+            StudentId = studentId,
+            Title = title,
+            Description = description,
+            StartDate = startDate,
+            EndDate = startDate.AddDays(durationInDay),
+            Status = HomeworkStatus.InProgress
+        };
 
     public override void Update(HomeworkUpdateDto dto)
     {
