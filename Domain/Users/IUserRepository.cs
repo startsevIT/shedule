@@ -2,7 +2,7 @@
 
 namespace Domain.Users;
 
-public interface IUserRepository : IRepositoryForModifiable<User, UserUpdateDto>
+public interface IUserRepository : ICrudModifiable<User, UserUpdateDto>
 {
     void Create(User[] users);
     List<User> Read(string[] logins);

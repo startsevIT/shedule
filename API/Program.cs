@@ -9,19 +9,16 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var jwtConfig = builder.Configuration.GetSection("JwtSettings");
-var smtpConfig = builder.Configuration.GetSection("SmtpSettings");
-var adminCredentials = builder.Configuration.GetSection("AdminCredentials");
-builder.Services.Configure<JwtSettings>(jwtConfig);
-builder.Services.Configure<SmtpSettings>(smtpConfig);
-builder.Services.Configure<AdminCredentials>(adminCredentials);
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(nameof(JwtSettings)));
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection(nameof(SmtpSettings)));
+builder.Services.Configure<AdminCredentials>(builder.Configuration.GetSection(nameof(AdminCredentials)));
 
 builder.Services.AddScoped<IDbContext, SqLiteDbContext>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var jwtSettings = jwtConfig.Get<JwtSettings>();
+        var jwtSettings =  builder.Configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();
         var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings!.Secret));
 
         options.TokenValidationParameters = new TokenValidationParameters
@@ -38,6 +35,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddRepositories();
 builder.Services.AddServices();
 builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {

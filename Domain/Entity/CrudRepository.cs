@@ -1,7 +1,7 @@
 namespace Domain.Entity;
 
 public abstract class CrudRepository<T, TUpdateDto>(IDbContext dbContext)
-    : CrdRepository<T>(dbContext), IRepositoryForModifiable<T, TUpdateDto>
+    : CrdRepository<T>(dbContext), ICrudModifiable<T, TUpdateDto>
     where TUpdateDto : UpdateDto
     where T : ModifyEntity<TUpdateDto>
 {
