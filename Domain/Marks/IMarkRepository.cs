@@ -2,4 +2,4 @@ using Domain.Entity;
 
 namespace Domain.Marks;
 
-public interface IMarkRepository : ICrudModifiable<Mark, MarkUpdateDto>;
+public interface IMarkRepository : ICrudRepository<Mark, MarkUpdateDto>;

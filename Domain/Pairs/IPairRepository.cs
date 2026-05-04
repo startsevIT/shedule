@@ -3,7 +3,7 @@ using Domain.Users;
 
 namespace Domain.Pairs;
 
-public interface IPairRepository : ICrudModifiable<Pair, PairUpdateDto>
+public interface IPairRepository : ICrudRepository<Pair, PairUpdateDto>
 {
     void Create(Pair[] toArray);
     public Pair[] Read(IEnumerable<DateTime> dates);

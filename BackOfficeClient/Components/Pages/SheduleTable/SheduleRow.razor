@@ -1,0 +1,10 @@
+﻿<div class="row">
+    @foreach (var cell in CellDatas)
+    {
+        <Cell Cabinet="@cell.Cabinet" Discipline="@cell.Discipline" Teacher="@cell.Teacher" ></Cell>
+    }
+</div>
+
+@code {
+    [Parameter] public CellData[] CellDatas { get; set; }
+}

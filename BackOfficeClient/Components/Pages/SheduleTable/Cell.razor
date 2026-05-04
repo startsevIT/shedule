@@ -1,0 +1,21 @@
+﻿<div class="cell">
+    <div class="cell-border">
+        <div class="cell-row">
+            <div class="cell-item">
+                @Discipline
+            </div>
+            <div class="cell-item">
+                @Cabinet
+            </div>
+        </div>
+        <div class="cell-item">
+            @Teacher
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Discipline { get; set; }
+    [Parameter] public string Cabinet { get; set; }
+    [Parameter] public string Teacher { get; set; }
+}

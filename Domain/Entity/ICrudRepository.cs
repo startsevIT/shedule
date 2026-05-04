@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entity;
 
-public interface ICrudModifiable<T, in TUpdateDto> : IRepository<T>
+public interface ICrudRepository<T, in TUpdateDto> : IRepository<T>
     where T : ModifyEntity<TUpdateDto>
     where TUpdateDto : UpdateDto
 {

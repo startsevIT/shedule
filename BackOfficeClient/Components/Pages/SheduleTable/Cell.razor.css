@@ -1,0 +1,20 @@
+﻿.cell-item {
+    border: 1px solid rgb(145, 145, 145);
+    padding: 10px;
+    overflow: hidden;
+}
+
+.cell-row {
+    display: flex;
+    flex-direction: row;
+}
+
+.cell-border {
+    overflow: hidden;
+    border: 2px solid rgb(68, 68, 68);
+    border-radius: 15px;
+}
+
+.cell {
+    width: fit-content;
+}

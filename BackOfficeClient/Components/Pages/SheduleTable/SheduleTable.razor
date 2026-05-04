@@ -1,0 +1,10 @@
+﻿<div class="table">
+    @foreach (var data in Data)
+    {
+        <SheduleRow CellDatas="@data"></SheduleRow>
+    }
+</div>
+
+@code {
+    [Parameter] public CellData[][] Data { get; set; }
+};

@@ -2,7 +2,7 @@
 
 namespace Domain.Groups;
 
-public interface IGroupRepository : ICrudModifiable<Group, GroupUpdateDto>
+public interface IGroupRepository : ICrudRepository<Group, GroupUpdateDto>
 {
     public Group[] Read(string[] names);
 }
