@@ -25,7 +25,8 @@ public class PairService(
                 dto.Date,
                 dto.CabinetNumber,
                 dto.TeacherId,
-                dto.Discipline);
+                dto.Discipline,
+                "white");
 
             pair.NotContainsConflict(teachers, existingPairs.Concat(createdPairs).ToArray());
 
@@ -63,10 +64,10 @@ public class PairService(
             throw new Exception("Пользователь не найден");
 
         if (user.Roles.Contains(Role.Teacher))
-            return pairRepo.Read(model, user.FullName);
+            return pairRepo.ReadForTeacher(model);
 
         if (user.Roles.Contains(Role.Student))
-            return pairRepo.Read(model, user.GroupId!.Value, userRepo);
+            return pairRepo.Read(model, user.GroupId!.Value);
 
         throw new Exception("У пользователя нет пар или нет доступа к парам");
     }

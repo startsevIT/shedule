@@ -13,26 +13,28 @@ public class Pair : ModifyEntity<PairUpdateDto>
     public Guid TeacherId { get; private set; }
     [Column("cabinet_number")]
     public string CabinetNumber { get; private set; }
+    [Column("color")]
+    public string Color { get; private set; }
     [Column("date")]
     public DateTime Date { get; private set; }
     [Column("group_number")]
     public Guid GroupId { get; private set; }
 
-    private Pair(Guid groupId, DateTime date, string cabinetNumber, Guid teacherId, string discipline)
-    {
-        GroupId = groupId;
-        Date = date;
-        CabinetNumber = cabinetNumber;
-        TeacherId = teacherId;
-        Discipline = discipline;
-    }
     public bool IsOnline => CabinetNumber == "СДО";
 
 
-    public static Pair Create(Guid groupId, DateTime date, string cabinetNumber, Guid teacherId, string discipline)
+    public static Pair Create(Guid groupId, DateTime date, string cabinetNumber, Guid teacherId, string discipline, string color)
         => !ValidateTime(date)
             ? throw new Exception("Некорректное время пары")
-            : new Pair(groupId, date, cabinetNumber, teacherId, discipline);
+            : new Pair
+            {
+                Discipline = discipline,
+                TeacherId = teacherId,
+                CabinetNumber = cabinetNumber,
+                Color = color,
+                Date = date,
+                GroupId = groupId
+            };
 
 
     private static bool ValidateTime(DateTime date)

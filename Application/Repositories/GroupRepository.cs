@@ -3,8 +3,12 @@ using Domain.Groups;
 
 namespace Application.Repositories;
 
-public class GroupRepository(IDbContext dbContext) : CrudRepository<Group, GroupUpdateDto>(dbContext),  IGroupRepository
+public class GroupRepository(IDbContext dbContext)
+    : CrudRepository<Group, GroupUpdateDto>(dbContext),  IGroupRepository
 {
     public Group[] Read(string[] names)
         => Storage.Where(x => names.Contains(x.Name)).ToArray();
+
+    public Group[] Read(Guid[] ids)
+        => Storage.Where(x => ids.Contains(x.Id)).ToArray();
 }

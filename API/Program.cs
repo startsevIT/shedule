@@ -18,13 +18,13 @@ builder.Services.AddScoped<IDbContext, SqLiteDbContext>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var jwtSettings =  builder.Configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();
+        var jwtSettings = builder.Configuration.GetSection(nameof(JwtSettings)).Get<JwtSettings>();
         var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings!.Secret));
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateAudience =  false,
-            ValidateIssuer =  false,
+            ValidateAudience = false,
+            ValidateIssuer = false,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = signingKey,
             ValidateLifetime = true,
@@ -79,16 +79,13 @@ app.UseCors(policy => policy
 
 app.Run();
 
-public static class ServiceRegistrator
+internal static class ServiceRegistrator
 {
-    extension(IServiceCollection services)
-    {
-        public void AddServices()
-            => AssemblyReflectionExtensions.GetServices()
-                .ForEach(x => services.AddScoped(x));
+    public static void AddServices(this IServiceCollection services)
+        => AssemblyReflectionExtensions.GetServices()
+            .ForEach(x => services.AddScoped(x));
 
-        public void AddRepositories()
-            => AssemblyReflectionExtensions.GetRepositories()
-                .ForEach(x => services.AddScoped(x.Interface, x.Implementation));
-    }
+    public static void AddRepositories(this IServiceCollection services)
+        => AssemblyReflectionExtensions.GetRepositories()
+            .ForEach(x => services.AddScoped(x.Interface, x.Implementation));
 }
