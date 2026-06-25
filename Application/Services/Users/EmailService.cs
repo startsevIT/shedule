@@ -1,4 +1,3 @@
-using System.Net;
 using System.Net.Mail;
 using Microsoft.Extensions.Options;
 
@@ -35,27 +34,4 @@ public class EmailService(IOptions<SmtpSettings> smtpSettingsOptions)
             throw new Exception($"Не получилось отправить сообщение на почту {to}");
         }
     }
-}
-
-public class SmtpClientWrapper(string host, int port)
-{
-    private readonly SmtpClient _client = new(host, port)
-    {
-        EnableSsl = true
-    };
-
-    public void SetCredentials(string username, string password) =>
-        _client.Credentials = new NetworkCredential(username, password);
-
-    public Task SendMailAsync(MailMessage message) =>
-        _client.SendMailAsync(message);
-}
-
-
-public class SmtpSettings
-{
-    public required string SmtpServer { get; set; }
-    public int SmtpPort { get; set; }
-    public required string SenderEmail { get; set; }
-    public required string SenderPassword { get; set; }
 }

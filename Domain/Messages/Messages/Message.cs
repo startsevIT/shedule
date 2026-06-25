@@ -1,8 +1,6 @@
-﻿using Domain.Entity;
+﻿namespace Domain.Messages.Messages;
 
-namespace Domain.Messages;
-
-public class Message : ModifyEntity<MessageUpdateDto>
+public class Message : Entity.Entities.Entity
 {
     public Guid ChatId { get; private set; }
     public Guid AuthorId { get; private set; }
@@ -12,13 +10,6 @@ public class Message : ModifyEntity<MessageUpdateDto>
     {
         ChatId = chatId,
         AuthorId = authorId,
-        Text = text
+        Text = text,
     };
-
-    public override void Update(MessageUpdateDto dto)
-    {
-        Text = dto.Text;
-    }
 }
-
-public record MessageUpdateDto(string Text) : UpdateDto;

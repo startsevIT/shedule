@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Domain.Entity;
+using Domain.Entity.Entities;
 using Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -41,5 +42,13 @@ public sealed class SqLiteDbContext : DbContext, IDbContext
 
         foreach (var type in AssemblyReflectionExtensions.GetEntities())
             modelBuilder.Entity(type);
+
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            entityType.SetTableName(SnakeCaseNamingConverter.ToSnakeCase(entityType.GetTableName()));
+
+            foreach (var property in entityType.GetProperties())
+                property.SetColumnName(SnakeCaseNamingConverter.ToSnakeCase(property.GetColumnName()));
+        }
     }
 }

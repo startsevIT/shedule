@@ -32,9 +32,3 @@ public class TokenService(IOptions<JwtSettings> jwtSettings)
         return tokenHandler.WriteToken(token);
     }
 }
-
-public class JwtSettings
-{
-    public string Secret { get; init; } = null!;
-    public int ExpirationMinutes { get; init; }
-};

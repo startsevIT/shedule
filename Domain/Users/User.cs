@@ -1,30 +1,20 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Security.Cryptography;
 using Domain.Entity;
+using Domain.Entity.Entities;
 
 namespace Domain.Users;
 
-[Table("users")]
 public class User : ModifyEntity<UserUpdateDto>
 {
-    [Column("first_name")] private string FirstName { get; set; } = null!;
-
-    [Column("name")] private string Name { get; set; } = null!;
-
-    [Column("patronymic")] private string Patronymic { get; set; } = null!;
-
-    [Column("email")] public string Email { get; private init; } = null!;
-
-    [Column("phone")] public string Phone { get; private init; } = null!;
-
-    [Column("hashed_password")] public string HashedPassword { get; set; } = null!;
-
-    [Column("salt")] public string Salt { get; set; } = null!;
-
-    [Column("roles")] public List<string> Roles { get; private init; } = null!;
-
-    [Column("group_id")] public Guid? GroupId { get; private set; }
+    private string FirstName { get; set; } = null!;
+    private string Name { get; set; } = null!;
+    private string Patronymic { get; set; } = null!;
+    public string Email { get; private init; } = null!;
+    public string Phone { get; private init; } = null!;
+    private string HashedPassword { get; set; } = null!;
+    private string Salt { get; set; } = null!;
+    public List<string> Roles { get; private init; } = null!;
+    public Guid? GroupId { get; private set; }
 
     public string Initials => $"{FirstName} {Name[0]}.{Patronymic[0]}.";
     public string FullName => $"{FirstName} {Name} {Patronymic}";
@@ -135,104 +125,4 @@ public class User : ModifyEntity<UserUpdateDto>
         Name = dto.Name ?? Name;
         Patronymic = dto.Patronymic ?? Patronymic;
     }
-}
-
-public record UserReadDto(
-    string FirstName,
-    string Name,
-    string Patronymic,
-    string Email,
-    string Phone,
-    List<string> Roles)
-{
-    public string? GroupName { get; set; }
-};
-
-public abstract record RegisterDto(
-    string FirstName,
-    string Name,
-    string Patronymic,
-    string Phone,
-    string Email);
-
-public interface IHavePassword
-{
-    public string Password { get; }
-}
-
-public record ManagerRegisterDto(
-    [Length(2, 50, ErrorMessage = "Длина фамилии должна быть от {1} до {2}")]
-    string FirstName,
-    [Length(2, 50, ErrorMessage = "Длина имени должна быть от {1} до {2}")]
-    string Name,
-    [Length(2, 50, ErrorMessage = "Длина имени должна быть от {1} до {2}")]
-    string Patronymic,
-    [EmailAddress(ErrorMessage = "Некорректная почта")]
-    string Email,
-    [Phone(ErrorMessage = "Некорректный номер телефона")]
-    string Phone,
-    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{10,}$")]
-    string Password) : RegisterDto(FirstName, Name, Patronymic, Phone, Email), IHavePassword;
-
-public record EntrantRegisterDto(
-    [Length(2, 50, ErrorMessage = "Длина фамилии должна быть от {1} до {2}")]
-    string FirstName,
-    [Length(2, 50, ErrorMessage = "Длина имени должна быть от {1} до {2}")]
-    string Name,
-    [Length(2, 50, ErrorMessage = "Длина имени должна быть от {1} до {2}")]
-    string Patronymic,
-    [EmailAddress(ErrorMessage = "Некорректная почта")]
-    string Email,
-    [Phone(ErrorMessage = "Некорректный номер телефона")]
-    string Phone,
-    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{10,}$")]
-    string Password) : RegisterDto(FirstName, Name, Patronymic, Phone, Email), IHavePassword;
-
-public record TeacherRegisterDto(
-    [Length(2, 50, ErrorMessage = "Длина фамилии должна быть от {1} до {2}")]
-    string FirstName,
-    [Length(2, 50, ErrorMessage = "Длина имени должна быть от {1} до {2}")]
-    string Name,
-    [Length(2, 50, ErrorMessage = "Длина имени должна быть от {1} до {2}")]
-    string Patronymic,
-    [EmailAddress(ErrorMessage = "Некорректная почта")]
-    string Email,
-    [Phone(ErrorMessage = "Некорректный номер телефона")]
-    string Phone) : RegisterDto(FirstName, Name, Patronymic, Phone, Email);
-
-public record StudentRegisterDto(
-    [Length(2, 50, ErrorMessage = "Длина фамилии должна быть от {1} до {2}")]
-    string FirstName,
-    [Length(2, 50, ErrorMessage = "Длина имени должна быть от {1} до {2}")]
-    string Name,
-    [Length(2, 50, ErrorMessage = "Длина имени должна быть от {1} до {2}")]
-    string Patronymic,
-    [EmailAddress(ErrorMessage = "Некорректная почта")]
-    string Email,
-    [Phone(ErrorMessage = "Некорректный номер телефона")]
-    string Phone,
-    [Required(ErrorMessage = "Не указан номер группы")]
-    Guid GroupId) : RegisterDto(FirstName, Name, Patronymic, Phone, Email);
-
-public record PasswordUpdateDto(
-    string OldPassword,
-    string NewPassword);
-
-public record UserUpdateDto(
-    string? FirstName,
-    string? Name,
-    string? Patronymic,
-    HashSet<string>? AddedRoles,
-    HashSet<string>? RemovedRoles,
-    Guid? GroupId = null) : UpdateDto;
-
-public class AdminCredentials
-{
-    public string FirstName { get; set; } = null!;
-    public string Name { get; set; } = null!;
-    public string Patronymic { get; set; } = null!;
-    public string Email { get; set; } = null!;
-    public string Phone { get; set; } = null!;
-    public string Password { get; set; } = null!;
-    public string Role { get; set; } = null!;
 }

@@ -1,0 +1,20 @@
+﻿@host = localhost:5262
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiMGVlMGIzZi02YjIzLTQ3YWItYTBjMS0yODY1NTMzMmUzOTMiLCJyb2xlIjoiYWRtaW4iLCJuYmYiOjE3ODIzMjQ1MTgsImV4cCI6MTc4MjMyODExOCwiaWF0IjoxNzgyMzI0NTE4fQ.Je4SHU10zHK7LwO1Csjb1ban7YEZoST3NHI4DsquJwc
+
+WEBSOCKET ws://{{host}}/api/messenger/connect/A39B3727-1EE8-425D-876B-A0A2FAAB6D16
+Authorization: Bearer {{token}}
+
+###
+
+GET https://{{host}}/api/messenger/connect/A39B3727-1EE8-425D-876B-A0A2FAAB6D16
+Authorization: Bearer {{token}}
+
+###
+
+POST https://{{host}}/login
+Content-Type: application/json
+
+{
+  "login": "s.t.a.r.t.s.e.v.it@yandex.ru",
+  "password": "05968902"
+}

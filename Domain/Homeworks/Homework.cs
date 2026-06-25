@@ -1,8 +1,9 @@
 ﻿using Domain.Entity;
+using Domain.Entity.Entities;
 
 namespace Domain.Homeworks;
 
-public class Homework : ModifyEntity<HomeworkUpdateDto>
+public class Homework : AutoModifyEntity<HomeworkUpdateDto>
 {
     private Guid TeacherId { get; set; }
     private Guid StudentId { get; set; }
@@ -45,24 +46,6 @@ public class Homework : ModifyEntity<HomeworkUpdateDto>
             EndDate = startDate.AddDays(durationInDay),
             Status = HomeworkStatus.InProgress
         };
-
-    public override void Update(HomeworkUpdateDto dto)
-    {
-        TeacherId = dto.TeacherId ?? TeacherId;
-        Title = dto.Title ?? Title;
-        Description = dto.Description ?? Description;
-        StartDate = dto.StartDate ?? StartDate;
-        EndDate = dto.EndDate ?? EndDate;
-        Status = dto.Status ?? Status;
-    }
 }
 
 //todo концепция, есть сущность дз, а есть сущность активного дз, разделить, в будуще можно будет шаблоны делать
-
-public record HomeworkUpdateDto(
-    Guid? TeacherId,
-    string? Title,
-    string? Description,
-    DateTime? StartDate,
-    DateTime? EndDate,
-    HomeworkStatus? Status) : UpdateDto;

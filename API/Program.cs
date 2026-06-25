@@ -1,4 +1,5 @@
 using System.Text;
+using API.Controllers;
 using Application.Services.Users;
 using Domain.Entity;
 using Domain.Users;
@@ -13,6 +14,7 @@ builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection(nameof(
 builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection(nameof(SmtpSettings)));
 builder.Services.Configure<AdminCredentials>(builder.Configuration.GetSection(nameof(AdminCredentials)));
 
+builder.Services.AddSingleton<WebSocketHub>();
 builder.Services.AddScoped<IDbContext, SqLiteDbContext>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -32,7 +34,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 builder.Services.AddAuthorization();
 
-builder.Services.AddRepositories();
 builder.Services.AddServices();
 builder.Services.AddControllers();
 
@@ -69,6 +70,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+app.UseWebSockets();
 app.MapControllers();
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -84,8 +86,4 @@ internal static class ServiceRegistrator
     public static void AddServices(this IServiceCollection services)
         => AssemblyReflectionExtensions.GetServices()
             .ForEach(x => services.AddScoped(x));
-
-    public static void AddRepositories(this IServiceCollection services)
-        => AssemblyReflectionExtensions.GetRepositories()
-            .ForEach(x => services.AddScoped(x.Interface, x.Implementation));
 }

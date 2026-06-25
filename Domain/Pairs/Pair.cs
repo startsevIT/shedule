@@ -1,23 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Entity;
+using Domain.Entity.Entities;
 using Domain.Users;
 
 namespace Domain.Pairs;
 
-[Table("pairs")]
-public class Pair : ModifyEntity<PairUpdateDto>
+public class Pair : AutoModifyEntity<PairUpdateDto>
 {
-    [Column("discipline")]
-    public string Discipline { get; private set; }
-    [Column("teacher_id")]
+    public string Discipline { get; private set; } = null!;
     public Guid TeacherId { get; private set; }
-    [Column("cabinet_number")]
-    public string CabinetNumber { get; private set; }
-    [Column("color")]
-    public string Color { get; private set; }
-    [Column("date")]
+    public string CabinetNumber { get; private set; } = null!;
+    public string Color { get; private set; } = null!; //todo pairDecoration
     public DateTime Date { get; private set; }
-    [Column("group_number")]
     public Guid GroupId { get; private set; }
 
     public bool IsOnline => CabinetNumber == "СДО";
@@ -88,20 +82,4 @@ public class Pair : ModifyEntity<PairUpdateDto>
             || cabinetConflictPairs.Any(x => x.TeacherId != TeacherId))
             throw new Exception(($"В кабинете {CabinetNumber} уже есть пара на время {Date.ToStringFormat()}"));
     }
-
-    public override void Update(PairUpdateDto dto)
-    {
-        Discipline = dto.Discipline ?? Discipline;
-        TeacherId = dto.TeacherId ?? TeacherId;
-        CabinetNumber = dto.CabinetNumber ?? CabinetNumber;
-        Date = dto.Date ?? Date;
-        GroupId = dto.GroupId ?? GroupId;
-    }
 }
-
-public record PairUpdateDto(
-    string? Discipline,
-    Guid? TeacherId,
-    string? CabinetNumber,
-    DateTime? Date,
-    Guid? GroupId) : UpdateDto;

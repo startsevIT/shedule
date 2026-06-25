@@ -1,8 +1,9 @@
 ﻿using Domain.Entity;
+using Domain.Entity.Entities;
 
 namespace Domain.Marks;
 
-public class Mark : ModifyEntity<MarkUpdateDto>
+public class Mark : AutoModifyEntity<MarkUpdateDto>
 {
     private Guid TeacherId { get; set; }
     private Guid StudentId { get; set; }
@@ -25,20 +26,4 @@ public class Mark : ModifyEntity<MarkUpdateDto>
             MarkType = markType,
             Value = value
         };
-
-    public override void Update(MarkUpdateDto dto)
-    {
-        TeacherId = dto.TeacherId ?? TeacherId;
-        StudentId = dto.StudentId ?? StudentId;
-        ObjectId = dto.ObjectId ?? ObjectId;
-        MarkType = dto.MarkType ?? MarkType;
-        Value = dto.Value ?? Value;
-    }
 }
-
-public record MarkUpdateDto(
-    Guid? TeacherId,
-    Guid? StudentId,
-    Guid? ObjectId,
-    MarkType? MarkType,
-    int? Value) : UpdateDto;

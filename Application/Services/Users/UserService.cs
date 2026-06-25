@@ -1,27 +1,23 @@
-﻿using Domain.Groups;
+﻿using Domain.Entity;
+using Domain.Groups;
 using Domain.Users;
 
 namespace Application.Services.Users;
 
 public class UserService(
-    IUserRepository userRepository,
-    IGroupRepository groupRepository,
+    EntityStorage entityStorage,
     PasswordGeneratorService passwordGeneratorService,
     EmailService emailService,
     EmailBodyGeneratedService emailBodyGeneratedService,
     TokenService tokenService)
 {
-    public Task RegisterTeachers(TeacherRegisterDto[] dtos)
-        => RegisterMany(dtos);
+    public Task RegisterTeachers(TeacherRegisterDto[] dtos) => RegisterMany(dtos);
 
-    public Task RegisterStudents(StudentRegisterDto[] dtos)
-        => RegisterMany(dtos);
+    public Task RegisterStudents(StudentRegisterDto[] dtos) => RegisterMany(dtos);
 
-    public Task RegisterManager(ManagerRegisterDto[] dtos)
-        => RegisterSingle(dtos);
+    public Task RegisterManager(ManagerRegisterDto[] dtos) => RegisterSingle(dtos);
 
-    public Task RegisterEntrant(EntrantRegisterDto[] dtos)
-        => RegisterSingle(dtos);
+    public Task RegisterEntrant(EntrantRegisterDto[] dtos) => RegisterSingle(dtos);
 
     public string Login(UserLoginDto dto)
         => Authenticate(dto.Login, dto.Password, out var user)
@@ -30,41 +26,56 @@ public class UserService(
 
     public UserReadDto GetAccount(Guid id)
     {
-        var user = userRepository.Read(id) ?? throw new Exception("Пользователь не найден");
+        var user = entityStorage.Read<User>(id)
+                   ?? throw new Exception("Пользователь не найден");
         var dto = user.ToDto();
         if (user.Roles.Contains(Role.Student))
         {
-            var group = groupRepository.Read(user.GroupId!.Value) ?? throw new Exception("У студента указана несуществующая группа");
+            var group = entityStorage.Read<Group>(user.GroupId!.Value)
+                        ?? throw new Exception("У студента указана несуществующая группа");
             dto.GroupName = group.Name;
         }
+
         return dto;
     }
 
     public void Update(Guid id, UserUpdateDto dto)
-        => userRepository.Update(id, dto);
+    {
+        var user = entityStorage.Read<User>(id)
+                   ?? throw new Exception("Пользователь не найден");
+        user.Update(dto);
+        entityStorage.Update(user);
+    }
 
     public void UpdatePassword(Guid id, PasswordUpdateDto dto)
-        => userRepository.UpdatePassword(id, dto);
+    {
+        var user = entityStorage.Read<User>(id)
+                   ?? throw new Exception("Пользователь не найден");
+        user.UpdatePassword(dto);
+        entityStorage.Update(user);
+    }
 
     private bool Authenticate(string login, string password, out User? user)
         => Identify([login], out user) && user!.VerifyPassword(password);
 
     private Task RegisterSingle<TRegisterDto>(TRegisterDto[] dtos)
-        where  TRegisterDto : RegisterDto, IHavePassword
+        where TRegisterDto : RegisterDto, IHavePassword
     {
         var dto = dtos.Single();
         if (Identify([dto.Email, dto.Phone], out _))
             throw new Exception("Пользователь уже существует");
-        userRepository.Create(User.Create(dto, dto.Password));
+        entityStorage.Create(User.Create(dto, dto.Password));
         return Task.CompletedTask;
     }
 
     private async Task RegisterMany<TRegisterDto>(TRegisterDto[] dtos)
         where TRegisterDto : RegisterDto
     {
-        var existUsers = userRepository
-            .Read(dtos.Select(x => x.Phone).Concat(dtos.Select(x => x.Email)).ToArray());
-        if (existUsers.Count != 0)
+        var existUsers = entityStorage.Select<User>()
+            .Where(x => dtos.Select(p => p.Phone).Contains(x.Phone)
+                        || dtos.Select(e => e.Email).Contains(x.Email))
+            .ToArray();
+        if (existUsers.Length != 0)
             throw new Exception("При регистрации студентов обнаружили совпадения в номерах телефонов или почтах");
 
         List<User> usersToCreate = [];
@@ -72,7 +83,7 @@ public class UserService(
         foreach (var dto in dtos)
         {
             var password = passwordGeneratorService.Generate();
-            var user = User.Create(dto,password);
+            var user = User.Create(dto, password);
 
             if (await emailService.SendAsync(emailBodyGeneratedService.GenerateEmailBody(user.FullName, user.Email, password), user.Email))
                 usersToCreate.Add(user);
@@ -84,23 +95,23 @@ public class UserService(
             throw new Exception("При отправке сообщений с паролями возникла ошибка");
 
         if (usersToCreate.Count != 0)
-            userRepository.Create([.. usersToCreate]);
+            entityStorage.Create([.. usersToCreate]);
     }
 
     private bool Identify(string[] identificators, out User? user)
     {
-        var users = userRepository.Read(identificators);
-        user = users.Count switch
+        var users = entityStorage.Select<User>()
+            .Where(x => identificators.Contains(x.Phone) || identificators.Contains(x.Email))
+            .ToArray();
+        user = users.Length switch
         {
             1 => users[0],
-            > 1 => throw new Exception($"Пользователей по этим данным {users.Count} шт. Надо разбираться"),
+            > 1 => throw new Exception($"Пользователей по этим данным {users.Length} шт. Надо разбираться"),
             _ => null
         };
-        return users.Count == 1;
+        return users.Length == 1;
     }
 }
-
-
 
 public record UserLoginDto(
     string Login,
